@@ -1,4 +1,5 @@
-const http = require("http")
+const http = require("http");
+
 
 const server = http.createServer((req, res) => {
 	if(req.method === "GET") {
@@ -7,26 +8,32 @@ const server = http.createServer((req, res) => {
 		})
 		res.end(`
 			<h1>Form</h1>
-			<form method="post" action="/">
-				<input name="title" type="text" />
+			<form method="post" action="/" accept-charset="utf-8">
+				<input name="title" type="text">
 				<button type="submit">Send</button>
 			</form>
 		`)
 	}
-	else if(res.method === "POST") {
+	else if(req.method === "POST") {
 		const body = []
+		let message = ""
 
 		req.on("data", data => {
 			body.push(Buffer.from(data))
+			message += data.toString("utf8")
 		})
 
+		res.writeHead(200, {
+			"Content-Type": "text/html; charset=utf-8"
+		})
 		req.on("end", () => {
-			console.log(body)
+			let title = message.split("=")[1]
+			console.log(title);
+			// const message = body.toString("utf8").split("=")[1]
+			res.end(`
+				<h1>Ваше сообщение: ${title} </h1>
+			`)
 		})
-
-		res.end(`
-			<h1>Ваше сообщение: </h1>
-		`)
 	}
 })
 
